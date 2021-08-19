@@ -1,0 +1,119 @@
+<html>
+  <head>
+    <title>Title</title>
+    <meta charset="utf-8">
+  </head>
+  <style>
+    table{
+      border-collapse: collapse;
+    }
+    td, th{
+      border: 1px solid black;
+    }
+  </style>
+  <body>  
+    <div id = "app">
+      <h2>即時匯率轉換器</h2>
+      幣別：
+      <select v-model="currency" v-on:change="setZero()">
+        <option value="USD">美金</option>
+        <option value="TWD">台幣</option>
+        <option value="JPY">日幣</option>
+      </select>
+      金額：
+      <input v-model="price"  type="number" step="0.01" name="price"/> 
+      - 折扣： 
+      <input v-if="currency == 'TWD'" type="number" step="0.01" name="discount" v-model="discount" /> 
+      <input v-else disabled="disabled" type="number" step="0.01" name="discount" v-model="discount" /> 
+      = 台幣結果： {{result}}
+      <br/>
+      <br/>
+      <button v-on:click="calculate()">計算</button>
+      <ul>
+        <li style="color:red">注意：幣別為美金或日幣時，折扣功能無效.</li>
+        <li style="color:red">注意：幣別為台幣時，需有折扣功能.</li>
+      </ul>
+      <div>
+        取得所有資料(GET):
+        <button v-on:click="getAll()">GET</button>
+        <table>
+          <tr>
+            <th>幣別</th>
+            <th>匯率</th>
+            <th>價格</th>
+            <th>折扣</th>
+            <th>結果</th>
+            <th>紀錄時間</th>
+          </tr>
+          <tr v-for="(item, index) in getResult">
+            <td>{{item.currency}}</td>
+            <td>{{item.rate}}</td>
+            <td>{{item.price}}</td>
+            <td>{{item.discount}}</td>
+            <td>{{item.result}}</td>
+            <td>{{item.record_time}}</td>
+          </tr>
+        </table>
+        <p>Get請求回傳的JSON顯示於Console中</p>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+
+    <script>
+      var app = new Vue({
+        el: '#app',
+        data: {
+            price: 0.0,
+            discount: 0.0,
+            currency: "USD",
+            result: 0.0,
+            getResult: [],
+        },
+        methods: {
+          //set to 0
+          setZero(){
+            this.discount = 0.0;
+          },
+          //Calculate
+          calculate: async function() {
+              let that = this;
+              var myHeaders = new Headers();
+              myHeaders.append("Content-Type", "application/json");
+
+              var raw = JSON.stringify({
+                "price": parseFloat(that.price),
+                "discount": parseFloat(that.discount),
+                "currency": that.currency
+            });
+            
+            var requestOptions = {
+              method: 'POST',
+              headers: myHeaders,
+              body: raw,
+              redirect: 'follow'
+            };
+            
+            fetch("https://java-intern-test.herokuapp.com/calculate", requestOptions)
+              .then(response => response.text())
+              .then(function(resp){
+                let res = JSON.parse(resp)
+                that.result = res.result;
+              })
+          }, 
+          //Get All Data
+          getAll: async function() {
+            let that = this;
+              
+            fetch("https://java-intern-test.herokuapp.com/calculate")
+              .then(response => response.text())
+              .then(function(resp){
+                console.log(resp);
+                that.getResult = JSON.parse(resp);
+              })
+          }     
+        }
+      })
+    </script>
+  </body>
+</html>
