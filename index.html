@@ -94,7 +94,7 @@
               redirect: 'follow'
             };
             
-            fetch("https://java-intern-test.herokuapp.com/calculate", requestOptions)
+            fetch("https://exchange-rate-java-backend.herokuapp.com/calculate", requestOptions)
               .then(response => response.text())
               .then(function(resp){
                 let res = JSON.parse(resp)
@@ -105,7 +105,7 @@
           getAll: async function() {
             let that = this;
               
-            fetch("https://java-intern-test.herokuapp.com/calculate")
+            fetch("https://exchange-rate-java-backend.herokuapp.com/calculate")
               .then(response => response.text())
               .then(function(resp){
                 console.log(resp);
