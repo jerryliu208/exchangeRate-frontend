@@ -1,2 +1,2 @@
 # 即時匯率轉換器前端
-前端單頁網頁的部分使用Vue.js</br>
+https://jerryliu208.github.io/exchangeRate-frontend/
